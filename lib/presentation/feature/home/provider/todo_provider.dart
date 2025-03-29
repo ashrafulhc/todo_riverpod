@@ -4,6 +4,7 @@ import 'package:todo_riverpod/domain/entities/todo/todo_entity.dart';
 import 'package:todo_riverpod/domain/usecases/todo/delete_todo_use_case.dart';
 import 'package:todo_riverpod/domain/usecases/todo/get_all_todos_use_case.dart';
 import 'package:todo_riverpod/domain/usecases/todo/add_todo_use_case.dart';
+import 'package:todo_riverpod/presentation/feature/home/provider/operation_status_provider.dart';
 
 part 'todo_provider.g.dart';
 
@@ -18,32 +19,48 @@ class TodoNotifier extends _$TodoNotifier {
     return injector<GetAllTodosUseCase>().run();
   }
 
-  Future<void> refresh() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(_fetchTodos);
-  }
-
   Future<void> addTodo(TodoEntity todo) async {
+    final operationNotifier =
+        ref.read(operationStatusNotifierProvider.notifier);
     try {
+      // Get current todos before operation
       final currentTodos = await future;
 
-      state = const AsyncValue.loading();
+      operationNotifier.startOperation(OperationType.adding,
+          message: 'Adding todo...');
 
       final addTodoUseCase = injector<AddTodoUseCase>();
       await addTodoUseCase.run(todo);
 
       state = AsyncValue.data([...currentTodos, todo]);
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
+
+      operationNotifier.operationSuccess('Todo added successfully!');
+    } catch (error) {
+      operationNotifier
+          .operationFailed('Failed to add todo: ${error.toString()}');
     }
   }
 
   Future<void> deleteTodo(TodoEntity todo) async {
-    final currentTodos = await future;
-    state = const AsyncValue.loading();
-    final deleteTodoUseCase = injector<DeleteTodoUseCase>();
-    await deleteTodoUseCase.run(todo);
-    state =
-        AsyncValue.data(currentTodos.where((t) => t.id != todo.id).toList());
+    final operationNotifier =
+        ref.read(operationStatusNotifierProvider.notifier);
+    try {
+      // Get current todos before operation
+      final currentTodos = await future;
+
+      operationNotifier.startOperation(OperationType.deleting,
+          message: 'Deleting todo...');
+
+      final deleteTodoUseCase = injector<DeleteTodoUseCase>();
+      await deleteTodoUseCase.run(todo);
+
+      state =
+          AsyncValue.data(currentTodos.where((t) => t.id != todo.id).toList());
+
+      operationNotifier.operationSuccess('Todo deleted successfully!');
+    } catch (error) {
+      operationNotifier
+          .operationFailed('Failed to delete todo: ${error.toString()}');
+    }
   }
 }
