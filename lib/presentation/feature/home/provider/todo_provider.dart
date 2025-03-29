@@ -19,29 +19,21 @@ class TodoNotifier extends _$TodoNotifier {
   }
 
   Future<void> refresh() async {
-    // First set to loading state
     state = const AsyncValue.loading();
-
-    // Then fetch and update state
     state = await AsyncValue.guard(_fetchTodos);
   }
 
   Future<void> addTodo(TodoEntity todo) async {
     try {
-      // Get current todos before setting loading state
       final currentTodos = await future;
 
-      // Set loading state
       state = const AsyncValue.loading();
 
-      // Add the todo
       final addTodoUseCase = injector<AddTodoUseCase>();
       await addTodoUseCase.run(todo);
 
-      // Update state with previous todos + new todo
       state = AsyncValue.data([...currentTodos, todo]);
     } catch (error, stackTrace) {
-      // Handle errors properly
       state = AsyncValue.error(error, stackTrace);
     }
   }

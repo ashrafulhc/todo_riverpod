@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:todo_riverpod/domain/entities/todo/todo_entity.dart';
 import 'package:todo_riverpod/presentation/feature/home/provider/todo_provider.dart';
 import 'package:todo_riverpod/presentation/feature/home/widgets/add_todo_dialog.dart';
+import 'package:todo_riverpod/presentation/feature/home/widgets/todo_list_view.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -16,7 +16,7 @@ class HomeScreen extends ConsumerWidget {
         title: const Text('Todo List'),
       ),
       body: todosAsync.when(
-        data: (todos) => _buildTodoList(todos, ref),
+        data: (todos) => TodoListView(todos: todos, ref: ref),
         loading: () => const Center(
           child: CircularProgressIndicator(),
         ),
@@ -31,41 +31,10 @@ class HomeScreen extends ConsumerWidget {
             onPressed: () {
               _showAddTodoDialog(context, ref);
             },
-            heroTag: 'addTodo',
             child: const Icon(Icons.add),
-          ),
-          const SizedBox(height: 16),
-          FloatingActionButton(
-            onPressed: () {
-              ref.read(todoNotifierProvider.notifier).refresh();
-            },
-            heroTag: 'refreshTodos',
-            child: const Icon(Icons.refresh),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildTodoList(List<TodoEntity> todos, WidgetRef ref) {
-    return ListView.builder(
-      itemCount: todos.length,
-      itemBuilder: (context, index) {
-        final todo = todos[index];
-        return ListTile(
-          title: Text(todo.todo),
-          leading: Checkbox(
-            value: todo.completed,
-            onChanged: null,
-          ),
-          trailing: IconButton(
-            onPressed: () {
-              ref.read(todoNotifierProvider.notifier).deleteTodo(todo);
-            },
-            icon: const Icon(Icons.delete_outline),
-          ),
-        );
-      },
     );
   }
 
