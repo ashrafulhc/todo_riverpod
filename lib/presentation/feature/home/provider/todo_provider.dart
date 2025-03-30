@@ -26,8 +26,7 @@ class TodoNotifier extends _$TodoNotifier {
       // Get current todos before operation
       final currentTodos = await future;
 
-      operationNotifier.startOperation(OperationType.adding,
-          message: 'Adding todo...');
+      operationNotifier.startOperation(message: 'Adding todo...');
 
       final addTodoUseCase = injector<AddTodoUseCase>();
       await addTodoUseCase.run(todo);
@@ -48,8 +47,7 @@ class TodoNotifier extends _$TodoNotifier {
       // Get current todos before operation
       final currentTodos = await future;
 
-      operationNotifier.startOperation(OperationType.deleting,
-          message: 'Deleting todo...');
+      operationNotifier.startOperation(message: 'Deleting todo...');
 
       final deleteTodoUseCase = injector<DeleteTodoUseCase>();
       await deleteTodoUseCase.run(todo);

@@ -2,41 +2,27 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'operation_status_provider.g.dart';
 
-enum OperationType {
-  none,
-  adding,
-  deleting,
-}
-
 class OperationStatus {
   OperationStatus({
     this.isLoading = false,
     this.message,
     this.isSuccess = false,
-    this.operationType = OperationType.none,
   });
 
   final bool isLoading;
   final String? message;
   final bool isSuccess;
-  final OperationType operationType;
 
   OperationStatus copyWith({
     bool? isLoading,
     String? message,
     bool? isSuccess,
-    OperationType? operationType,
   }) {
     return OperationStatus(
       isLoading: isLoading ?? this.isLoading,
       message: message ?? this.message,
       isSuccess: isSuccess ?? this.isSuccess,
-      operationType: operationType ?? this.operationType,
     );
-  }
-
-  static OperationStatus initial() {
-    return OperationStatus();
   }
 }
 
@@ -44,14 +30,13 @@ class OperationStatus {
 class OperationStatusNotifier extends _$OperationStatusNotifier {
   @override
   OperationStatus build() {
-    return OperationStatus.initial();
+    return OperationStatus();
   }
 
-  void startOperation(OperationType type, {String? message}) {
+  void startOperation({String? message}) {
     state = OperationStatus(
       isLoading: true,
       message: message ?? 'Operation in progress...',
-      operationType: type,
     );
   }
 
@@ -72,6 +57,6 @@ class OperationStatusNotifier extends _$OperationStatusNotifier {
   }
 
   void reset() {
-    state = OperationStatus.initial();
+    state = OperationStatus();
   }
 }
