@@ -11,7 +11,6 @@ class TodoListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      key: ValueKey(todos.length),
       itemCount: todos.length,
       itemBuilder: (context, index) {
         final todo = todos[index];
